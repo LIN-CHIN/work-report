@@ -9,7 +9,7 @@ namespace WorkReportClient.Services
     /// </summary>
     public class WorkReportService : IWorkReportService
     {
-        const string REPORT_URL = "http://localhost/api/workReport";
+        const string REPORT_URL = "http://localhost/api/WorkReport";
         private readonly HttpClient _httpClient;
 
         /// <summary>
