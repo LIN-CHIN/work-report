@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecordWorker", "RecordWorke
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalculateWorker", "CalculateWorker\CalculateWorker.csproj", "{14D6969C-0833-4EF6-85DE-A243F32B1B94}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PublishWorker", "PublishWorker\PublishWorker.csproj", "{E5245D80-63AE-42A9-AA8C-CB6E20911259}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{14D6969C-0833-4EF6-85DE-A243F32B1B94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14D6969C-0833-4EF6-85DE-A243F32B1B94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14D6969C-0833-4EF6-85DE-A243F32B1B94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5245D80-63AE-42A9-AA8C-CB6E20911259}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5245D80-63AE-42A9-AA8C-CB6E20911259}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5245D80-63AE-42A9-AA8C-CB6E20911259}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5245D80-63AE-42A9-AA8C-CB6E20911259}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
