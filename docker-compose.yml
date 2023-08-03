@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  RecordDb:
+    image: postgres:14.1-alpine
+    container_name: RecordDb
+    restart: always
+    ports:
+      - "5432:5432"
+    mem_limit: 300m
+    environment:
+      - TZ=Asia/Taipei
+      - POSTGRES_USER=$DEFAULT_USER
+      - POSTGRES_PASSWORD=$DEFAULT_PASSWORD
+      - POSTGRES_DB=$MAIN_DB
+    volumes:
+      - ~/.docker-conf/RecordDb/data:/var/lib/postgresql/data

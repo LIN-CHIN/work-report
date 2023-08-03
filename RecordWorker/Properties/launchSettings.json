@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "RecordWorker": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
