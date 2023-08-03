@@ -11,7 +11,7 @@ using RecordWorker.Context;
 namespace RecordWorker.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230802092612_init")]
+    [Migration("20230803063820_init")]
     partial class init
     {
         /// <inheritdoc />
