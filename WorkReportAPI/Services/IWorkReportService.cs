@@ -1,4 +1,6 @@
-﻿namespace WorkReportAPI.Services
+﻿using WorkReportAPI.DTOs;
+
+namespace WorkReportAPI.Services
 {
     /// <summary>
     /// 報工Service Interface
@@ -9,6 +11,6 @@
         /// 報工
         /// </summary>
         /// <param name="reportModel"></param>
-        void Report(ReportModel reportModel);
+        void Report(ReportDTO reportModel);
     }
 }

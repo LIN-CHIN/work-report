@@ -1,41 +1,35 @@
 ﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
-namespace WorkReportAPI
+namespace WorkReportAPI.DTOs
 {
     /// <summary>
-    /// 報工用的Model
+    /// 報工DTO
     /// </summary>
-    public class ReportModel
+    public class ReportDTO
     {
-        /// <summary>
-        /// 事件id
-        /// </summary>
-        [Required]
-        public Guid EventId { get; set; }
-
         /// <summary>
         /// 設備代碼
         /// </summary>
-        [Required]
+        [JsonRequired]
         public string MachineNumber { get; set; }
 
         /// <summary>
         /// 花費時間(小時)
         /// </summary>
-        [Required]
+        [JsonRequired]
         public int SpendTimeHour { get; set; }
 
         /// <summary>
         /// 花費時間(分鐘)
         /// </summary>
-        [Required]
+        [JsonRequired]
         public int SpendTimeMinute { get; set; }
 
         /// <summary>
         /// 花費時間(秒)
         /// </summary>
-        [Required]
+        [JsonRequired]
         public int SpendTimeSecond { get; set; }
     }
 }

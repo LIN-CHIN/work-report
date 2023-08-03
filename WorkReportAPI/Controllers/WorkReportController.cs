@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WorkReportAPI.DTOs;
 using WorkReportAPI.Services;
 
 namespace WorkReportAPI.Controllers
@@ -24,7 +25,7 @@ namespace WorkReportAPI.Controllers
         /// <param name="reportModel"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Report(ReportModel reportModel) 
+        public IActionResult Report(ReportDTO reportModel) 
         {
             _workReportService.Report(reportModel);
             return Ok();

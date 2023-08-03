@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using RabbitMQ.Client;
 using System.Text;
+using WorkReportAPI.DTOs;
 
 namespace WorkReportAPI.Services
 {
@@ -10,7 +11,7 @@ namespace WorkReportAPI.Services
     public class WorkReportService : IWorkReportService
     {
         ///<inheritdoc/>
-        public void Report(ReportModel reportModel)
+        public void Report(ReportDTO reportModel)
         {
             var factory = new ConnectionFactory { HostName = "localhost" };
 
@@ -24,8 +25,17 @@ namespace WorkReportAPI.Services
                 autoDelete: false,
                 arguments: null);
 
+            ReportModel result = new ReportModel
+            {
+                EventId = Guid.NewGuid(),
+                MachineNumber = reportModel.MachineNumber,
+                SpendTimeHour = reportModel.SpendTimeHour,
+                SpendTimeMinute = reportModel.SpendTimeMinute,
+                SpendTimeSecond = reportModel.SpendTimeSecond
+            };
+
             var body = Encoding.UTF8.GetBytes( 
-                JsonConvert.SerializeObject(reportModel));
+                JsonConvert.SerializeObject(result));
 
             channel.BasicPublish(
                 exchange: string.Empty,
