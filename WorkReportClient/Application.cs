@@ -28,14 +28,17 @@ namespace WorkReportClient
         /// </summary>
         public void Run() 
         {
-            _workReportService.Report(new ReportModel
+            while (true) 
             {
-                MachineNumber = GetMachineNumber(),
-                SpendTimeHour = GetSpendTimeHour(),
-                SpendTimeMinute = GetSpendTimeMinute(),
-                SpendTimeSecond = GetSpendTimeSecond(),
-            });
-
+                Console.WriteLine("Start work report .");
+                _workReportService.Report(new ReportModel
+                {
+                    MachineNumber = GetMachineNumber(),
+                    SpendTimeHour = GetSpendTimeHour(),
+                    SpendTimeMinute = GetSpendTimeMinute(),
+                    SpendTimeSecond = GetSpendTimeSecond(),
+                });
+            }
         }
 
         /// <summary>
