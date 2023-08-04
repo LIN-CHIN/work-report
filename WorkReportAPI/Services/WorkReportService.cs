@@ -13,7 +13,10 @@ namespace WorkReportAPI.Services
         ///<inheritdoc/>
         public void Report(ReportDTO reportModel)
         {
-            var factory = new ConnectionFactory { HostName = "localhost" };
+            Console.WriteLine("Preparing to put the information into the queue.");
+            var factory = new ConnectionFactory { 
+                HostName = "rabbitmq",
+                Port = 5672 };
 
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
@@ -43,6 +46,7 @@ namespace WorkReportAPI.Services
                 basicProperties: null,
                 body: body);
 
+            Console.WriteLine("Placement completed.");
         }
     }
 }

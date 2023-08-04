@@ -1,18 +1,31 @@
 version: '3.8'
 services:
-  RabbitMQ:
-    image: rabbitmq:3-management
-    container_name: RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3.8.27-management-alpine
+    container_name: rabbitmq
+    hostname: rabbitmq
     restart: always
-    environment:
-      - RABBITMQ_DEFAULT_USER=$RABBITMQ_DEFAULT_USER
-      - RABBITMQ_DEFAULT_PASS=$RABBITMQ_DEFAULT_PASS
     ports: 
       - "15672:15672"
       - "5672:5672"
-  RecordDb:
+    volumes : 
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    environment:
+      - TZ=Asia/Taipei
+      - RABBITMQ_DEFAULT_USER="guest"
+      - RABBITMQ_DEFAULT_PASS="guest"
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    networks: 
+      - report-network
+  record-db:
     image: postgres:14.1-alpine
-    container_name: RecordDb
+    container_name: record-db
+    hostname: record-db
     restart: always
     ports:
       - "5432:5432"
@@ -24,30 +37,36 @@ services:
       - POSTGRES_DB=$MAIN_DB
     volumes:
       - ~/.docker-conf/RecordDb/data:/var/lib/postgresql/data
-  WorkReportClient:
-    container_name: WorkReportClient
+    networks: 
+      - report-network
+  work-report-api:
+    container_name: work-report-api
+    hostname: work-report-api
     restart: always
     ports: 
       - "7001:80"
     build: 
       context: .
-      dockerfile: ./WorkReportClient/Dockerfile
-  WorkReportAPI:
-    container_name: WorkReportAPI
+      dockerfile: ./WorkReportAPI/Dockerfile
+    networks: 
+      - report-network
+  record-worker:
+    container_name: record-worker
+    hostname: record-worker
     restart: always
     ports: 
       - "7002:80"
     build: 
       context: .
-      dockerfile: ./WorkReportAPI/Dockerfile
-  RecordWorker:
-    container_name: RecordWorker
-    restart: always
-    ports: 
-      - "7003:80"
-    build: 
-      context: .
       dockerfile: ./RecordWorker/Dockerfile
+    networks: 
+      - report-network
     depends_on:
-      - RecordDb
-  
+      rabbitmq:
+        condition: service_healthy
+      record-db:
+        condition: service_started
+      
+networks:
+  report-network:
+    name: report-network

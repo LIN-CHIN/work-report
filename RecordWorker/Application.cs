@@ -16,6 +16,7 @@ namespace RecordWorker
     public class Application
     {
         private readonly IWorkReportRecordService _workReportRecordService;
+        private static ManualResetEvent _manualResetEvent = new ManualResetEvent(false);
 
         /// <summary>
         /// Constructor
@@ -31,7 +32,10 @@ namespace RecordWorker
         /// </summary>
         public void Run()
         {
-            var factory = new ConnectionFactory { HostName = "localhost" };
+            var factory = new ConnectionFactory {
+                HostName = "rabbitmq",
+                Port = 5672
+            };
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
 
@@ -45,6 +49,7 @@ namespace RecordWorker
             var consumer = new EventingBasicConsumer(channel);
             consumer.Received += (model, ea) =>
             {
+                Console.WriteLine("The Record Worker has received the message");
                 var body = ea.Body.ToArray();
                 ReportModel? reportModel = JsonConvert.DeserializeObject<ReportModel>(
                     Encoding.UTF8.GetString(body));
@@ -60,8 +65,16 @@ namespace RecordWorker
                         SpendTimeSecond = reportModel.SpendTimeSecond
                     });
                 }
+
+                channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                Console.WriteLine("The record has been completed.");
             };
 
+            channel.BasicConsume(queue: "workReport",
+                     autoAck: false,
+                     consumer: consumer);
+
+            while (true) { };
         }
     }
 }
