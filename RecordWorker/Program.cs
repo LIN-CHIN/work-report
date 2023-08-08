@@ -10,7 +10,7 @@ try
 {
     var config = new ConfigurationBuilder()
         .AddJsonFile("appsettings.json")
-        //.AddEnvironmentVariables()
+        .AddEnvironmentVariables()
         .Build();
 
     var appSettings = config.GetSection("AppSettings")
