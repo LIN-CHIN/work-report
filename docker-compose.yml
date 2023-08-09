@@ -22,6 +22,23 @@ services:
       retries: 3
     networks: 
       - report-network
+  redis:
+    container_name: redis
+    hostname: redis
+    image: redis
+    ports:
+      - "6379:6379"
+
+  redis-commander:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: rediscommander/redis-commander:latest
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    
   record-db:
     image: postgres:14.1-alpine
     container_name: record-db
@@ -59,6 +76,9 @@ services:
     build: 
       context: .
       dockerfile: ./RecordWorker/Dockerfile
+    environment:
+      - TZ=Asia/Taipei
+      - AppSettings__ConnectionString=$RECORD_DB_CONNECTION
     networks: 
       - report-network
     depends_on:
@@ -66,6 +86,24 @@ services:
         condition: service_healthy
       record-db:
         condition: service_started
+  calculate-worker:
+    container_name: calculate-worker
+    hostname: calculate-worker
+    restart: always
+    ports: 
+      - "7003:80"
+    build: 
+      context: .
+      dockerfile: ./CalculateWorker/Dockerfile
+    environment:
+      - TZ=Asia/Taipei
+    networks: 
+      - report-network
+    depends_on: 
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
       
 networks:
   report-network:
