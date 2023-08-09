@@ -5,6 +5,7 @@ services:
     container_name: rabbitmq
     hostname: rabbitmq
     restart: always
+    mem_limit: 2g
     ports: 
       - "15672:15672"
       - "5672:5672"
@@ -26,8 +27,11 @@ services:
     container_name: redis
     hostname: redis
     image: redis
+    mem_limit: 2g
     ports:
       - "6379:6379"
+    networks: 
+      - report-network
 
   redis-commander:
     container_name: redis-commander
@@ -36,8 +40,11 @@ services:
     restart: always
     environment:
       - REDIS_HOSTS=local:redis:6379
+    mem_limit: 300m
     ports:
       - "8081:8081"
+    networks: 
+      - report-network
     
   record-db:
     image: postgres:14.1-alpine
@@ -60,6 +67,7 @@ services:
     container_name: work-report-api
     hostname: work-report-api
     restart: always
+    mem_limit: 300m
     ports: 
       - "7001:80"
     build: 
@@ -71,6 +79,7 @@ services:
     container_name: record-worker
     hostname: record-worker
     restart: always
+    mem_limit: 300m
     ports: 
       - "7002:80"
     build: 
@@ -90,6 +99,7 @@ services:
     container_name: calculate-worker
     hostname: calculate-worker
     restart: always
+    mem_limit: 300m
     ports: 
       - "7003:80"
     build: 

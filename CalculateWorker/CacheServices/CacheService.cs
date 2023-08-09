@@ -35,7 +35,6 @@ namespace CalculateWorker.CacheServices
             ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(connectionString);
             _db = redis.GetDatabase(0);
 
-            Console.WriteLine("連結成功");
         }
 
         ///<inheritdoc/>

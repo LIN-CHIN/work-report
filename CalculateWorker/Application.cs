@@ -36,19 +36,35 @@ namespace CalculateWorker
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
 
+            const string EXCHANGE_NAME = "workReport";
+            const string WORK_REPORT_QUEUE_NAME = "workReportB";
+            const string CALCULATED_RESULT_QUEUE_NAME = "calculatedResult";
+
             channel.QueueDeclare(
-                queue: "workReport",
+                queue: WORK_REPORT_QUEUE_NAME,
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
                 arguments: null);
 
             channel.QueueDeclare(
-               queue: "calculatedReult",
+               queue: CALCULATED_RESULT_QUEUE_NAME,
                durable: true,
                exclusive: false,
                autoDelete: false,
                arguments: null);
+
+            //設定Exchange
+            channel.ExchangeDeclare(
+                exchange: EXCHANGE_NAME,
+                type: ExchangeType.Fanout);
+
+            //綁定Queue & Exchange
+            channel.QueueBind(
+                queue: WORK_REPORT_QUEUE_NAME,
+                exchange: EXCHANGE_NAME,
+                routingKey: string.Empty
+                );
 
             var consumer = new EventingBasicConsumer(channel);
             consumer.Received += (model, ea) =>
@@ -121,7 +137,7 @@ namespace CalculateWorker
                     //發送訊息
                     channel.BasicPublish(
                         exchange: string.Empty,
-                        routingKey: "calculatedReult",
+                        routingKey: CALCULATED_RESULT_QUEUE_NAME,
                         basicProperties: null,
                         body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(calculationResult)) );
 
@@ -132,10 +148,9 @@ namespace CalculateWorker
                 Console.WriteLine("The calculate worker has been completed.");
             };
 
-            channel.BasicConsume(queue: "workReport",
+            channel.BasicConsume(queue: WORK_REPORT_QUEUE_NAME,
                      autoAck: false,
                      consumer: consumer);
-
             while (true) { };
         }
     }

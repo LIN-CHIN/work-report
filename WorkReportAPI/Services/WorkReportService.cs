@@ -21,12 +21,12 @@ namespace WorkReportAPI.Services
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
 
-            channel.QueueDeclare(
-                queue: "workReport",
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null);
+            const string EXCHANGE_NAME = "workReport";
+
+            //設定Exchange
+            channel.ExchangeDeclare(
+                exchange: EXCHANGE_NAME,
+                type: ExchangeType.Fanout);
 
             ReportModel result = new ReportModel
             {
@@ -41,8 +41,8 @@ namespace WorkReportAPI.Services
                 JsonConvert.SerializeObject(result));
 
             channel.BasicPublish(
-                exchange: string.Empty,
-                routingKey: "workReport",
+                exchange: EXCHANGE_NAME,
+                routingKey: string.Empty,
                 basicProperties: null,
                 body: body);
 
