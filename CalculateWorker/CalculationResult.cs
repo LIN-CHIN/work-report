@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,15 @@ namespace CalculateWorker
 {
     public class CalculationResult
     {
+        /// <summary>
+        /// 設備代碼
+        /// </summary>
+        [Required]
+        public string MachineNumber 
+        {
+            get; set;
+        }
+
         /// <summary>
         /// 總小時數
         /// </summary>

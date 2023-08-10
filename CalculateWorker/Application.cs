@@ -94,6 +94,7 @@ namespace CalculateWorker
                     string countKey = $"{reportModel.MachineNumber}_Count";
 
                     CalculationResult calculationResult = new CalculationResult();
+                    calculationResult.MachineNumber = reportModel.MachineNumber;
 
                     //小時計算
                     if (_cacheService.IsKeyExist(hourKey))
