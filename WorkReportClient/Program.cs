@@ -15,6 +15,7 @@ try
     // 建立 DI 容器
     var serviceProvider = new ServiceCollection()
         .AddSingleton<Application>()
+        .AddSingleton<IConfiguration>(config)
         .AddSingleton(appSettings!)
         .AddTransient<IWorkReportService, WorkReportService>()
         .AddHttpClient()
