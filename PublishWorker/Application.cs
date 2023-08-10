@@ -53,6 +53,7 @@ namespace PublishWorker
                     Console.WriteLine($"TotalMinute : {calculationResult.TotalMinute}");
                     Console.WriteLine($"TotalSecond : {calculationResult.TotalSecond}");
                     Console.WriteLine($"TotalCount : {calculationResult.TotalCount}");
+                    Console.WriteLine($"--------------------------------------------");
                 }
 
                 channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
@@ -61,6 +62,8 @@ namespace PublishWorker
             channel.BasicConsume(queue: CALCULATED_RESULT_QUEUE_NAME,
                      autoAck: false,
                      consumer: consumer);
+
+            while (true) { };
         }
     }
 }

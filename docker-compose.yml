@@ -114,6 +114,21 @@ services:
         condition: service_started
       rabbitmq:
         condition: service_healthy
+  publish-worker:
+    container_name: publish-worker
+    hostname: publish-worker
+    restart: always
+    mem_limit: 300m
+    build: 
+      context: .
+      dockerfile: ./PublishWorker/Dockerfile
+    environment:
+      - TZ=Asia/Taipei
+    networks: 
+      - report-network
+    depends_on: 
+      rabbitmq:
+        condition: service_healthy
       
 networks:
   report-network:

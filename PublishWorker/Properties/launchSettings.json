@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "PublishWorker": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
