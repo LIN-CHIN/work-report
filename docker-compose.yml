@@ -80,8 +80,6 @@ services:
     hostname: record-worker
     restart: always
     mem_limit: 300m
-    ports: 
-      - "7002:80"
     build: 
       context: .
       dockerfile: ./RecordWorker/Dockerfile
@@ -100,8 +98,6 @@ services:
     hostname: calculate-worker
     restart: always
     mem_limit: 300m
-    ports: 
-      - "7003:80"
     build: 
       context: .
       dockerfile: ./CalculateWorker/Dockerfile
