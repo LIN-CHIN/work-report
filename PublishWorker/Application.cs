@@ -11,6 +11,8 @@ namespace PublishWorker
 {
     public class Application
     {
+        private static ManualResetEvent _manualResetEvent = new ManualResetEvent(false);
+
         public Application() 
         {
         
@@ -63,7 +65,7 @@ namespace PublishWorker
                      autoAck: false,
                      consumer: consumer);
 
-            while (true) { };
+            _manualResetEvent.WaitOne();
         }
     }
 }

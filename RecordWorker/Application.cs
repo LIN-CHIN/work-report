@@ -89,7 +89,7 @@ namespace RecordWorker
                      autoAck: false,
                      consumer: consumer);
 
-            while (true) { };
+            _manualResetEvent.WaitOne();
         }
     }
 }

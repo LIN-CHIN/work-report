@@ -12,6 +12,7 @@ namespace CalculateWorker
 {
     public class Application
     {
+        private static ManualResetEvent _manualResetEvent = new ManualResetEvent(false);
         private readonly ICacheService _cacheService;
 
         /// <summary>
@@ -152,7 +153,7 @@ namespace CalculateWorker
             channel.BasicConsume(queue: WORK_REPORT_QUEUE_NAME,
                      autoAck: false,
                      consumer: consumer);
-            while (true) { };
+             _manualResetEvent.WaitOne();
         }
     }
 }
