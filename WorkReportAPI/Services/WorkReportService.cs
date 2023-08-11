@@ -28,14 +28,7 @@ namespace WorkReportAPI.Services
                 exchange: EXCHANGE_NAME,
                 type: ExchangeType.Fanout);
 
-            ReportModel result = new ReportModel
-            {
-                EventId = Guid.NewGuid(),
-                MachineNumber = reportModel.MachineNumber,
-                SpendTimeHour = reportModel.SpendTimeHour,
-                SpendTimeMinute = reportModel.SpendTimeMinute,
-                SpendTimeSecond = reportModel.SpendTimeSecond
-            };
+            ReportModel result = ReportModel.ConvertReportModel(reportModel);
 
             var body = Encoding.UTF8.GetBytes( 
                 JsonConvert.SerializeObject(result));

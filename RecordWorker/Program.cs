@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using RecordWorker;
 using RecordWorker.Context;
 using RecordWorker.DAOs;
+using RecordWorker.RabbitMQ;
 using RecordWorker.Services;
 
 try
@@ -24,6 +25,7 @@ try
         .AddSingleton<Application>()
         .AddScoped<IWorkReportRecordService, WorkReportRecordService>()
         .AddScoped<IWorkReportRecordDAO, WorkReportRecordDAO>()
+        .AddScoped<IRabbitMQHelper, RabbitMQHelper>()
         .BuildServiceProvider();
 
     // Entity Framework migrate on startup

@@ -4,27 +4,35 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RecordWorker.Context;
 using RecordWorker.Entities;
+using RecordWorker.RabbitMQ;
 using RecordWorker.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace RecordWorker
 {
     public class Application
     {
-        private readonly IWorkReportRecordService _workReportRecordService;
         private static ManualResetEvent _manualResetEvent = new ManualResetEvent(false);
+        private readonly IWorkReportRecordService _workReportRecordService;
+        private readonly IRabbitMQHelper _rabbitMQHelper;
+        private readonly string _exchangeName = "workReport";
+        private readonly string _queueName = "workReportA";
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="workReportRecordService"></param>
-        public Application(IWorkReportRecordService workReportRecordService)
+        /// <param name="rabbitMQHelper"></param>
+        public Application(IWorkReportRecordService workReportRecordService,
+            IRabbitMQHelper rabbitMQHelper)
         {
-           _workReportRecordService = workReportRecordService;
+            _workReportRecordService = workReportRecordService;
+            _rabbitMQHelper = rabbitMQHelper;
         }
 
         /// <summary>
@@ -32,34 +40,12 @@ namespace RecordWorker
         /// </summary>
         public void Run()
         {
-            var factory = new ConnectionFactory {
-                HostName = "rabbitmq",
-                Port = 5672
-            };
-            using var connection = factory.CreateConnection();
-            using var channel = connection.CreateModel();
+            using var connection = _rabbitMQHelper.Connect();
+            using var channel = _rabbitMQHelper.CreateModel(connection);
 
-            const string EXCHANGE_NAME = "workReport";
-            const string QUEUE_NAME = "workReportA";
-
-            channel.QueueDeclare(
-                queue: QUEUE_NAME,
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null);
-
-            //設定Exchange
-            channel.ExchangeDeclare(
-                exchange: EXCHANGE_NAME,
-                type: ExchangeType.Fanout);
-
-            //綁定Queue & Exchange
-            channel.QueueBind(
-                queue: QUEUE_NAME,
-                exchange: EXCHANGE_NAME,
-                routingKey: string.Empty
-                );
+            SetQueue(channel);
+            SetExchange(channel);
+            BindQueue(channel);
 
             var consumer = new EventingBasicConsumer(channel);
             consumer.Received += (model, ea) =>
@@ -85,11 +71,51 @@ namespace RecordWorker
                 Console.WriteLine("The record has been completed.");
             };
 
-            channel.BasicConsume(queue: QUEUE_NAME,
+            channel.BasicConsume(queue: _queueName,
                      autoAck: false,
                      consumer: consumer);
 
             _manualResetEvent.WaitOne();
+        }
+
+        /// <summary>
+        /// 設定Queue
+        /// </summary>
+        /// <param name="channel"></param>
+        private void SetQueue(IModel channel) 
+        {
+            channel.QueueDeclare(
+                    queue: _queueName,
+                    durable: true,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: null
+            );
+        }
+
+        /// <summary>
+        /// 設定Exchange
+        /// </summary>
+        /// <param name="channel"></param>
+        private void SetExchange(IModel channel)
+        {
+            channel.ExchangeDeclare(
+                exchange: _exchangeName,
+                type: ExchangeType.Fanout
+            );
+        }
+
+        /// <summary>
+        /// 綁定Queue & Exchange
+        /// </summary>
+        /// <param name="channel"></param>
+        private void BindQueue(IModel channel) 
+        {
+            channel.QueueBind(
+                queue: _queueName,
+                exchange: _exchangeName,
+                routingKey: string.Empty
+            );
         }
     }
 }

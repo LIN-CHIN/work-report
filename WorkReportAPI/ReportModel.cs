@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
+using WorkReportAPI.DTOs;
 
 namespace WorkReportAPI
 {
@@ -37,5 +38,22 @@ namespace WorkReportAPI
         /// </summary>
         [Required]
         public int SpendTimeSecond { get; set; }
+
+        /// <summary>
+        /// 轉換成ReportModel
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public static ReportModel ConvertReportModel(ReportDTO dto) 
+        {
+            return new ReportModel
+            {
+                EventId = Guid.NewGuid(),
+                MachineNumber = dto.MachineNumber,
+                SpendTimeHour = dto.SpendTimeHour,
+                SpendTimeMinute = dto.SpendTimeMinute,
+                SpendTimeSecond = dto.SpendTimeSecond
+            };
+        }
     }
 }
