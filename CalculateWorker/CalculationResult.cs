@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace CalculateWorker
 {
+    /// <summary>
+    /// 計算結果
+    /// </summary>
     public class CalculationResult
     {
         /// <summary>

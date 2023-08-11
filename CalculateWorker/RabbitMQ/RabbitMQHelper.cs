@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RecordWorker.RabbitMQ
+namespace CalculateWorker.RabbitMQ
 {
     /// <summary>
     /// 實現RabbitMQ功能的Helper 
@@ -14,7 +14,7 @@ namespace RecordWorker.RabbitMQ
     {
         private readonly ConnectionFactory _factory;
         private readonly AppSettings _appSettings;
-        public RabbitMQHelper(AppSettings appSettings) 
+        public RabbitMQHelper(AppSettings appSettings)
         {
             _appSettings = appSettings;
             _factory = new ConnectionFactory

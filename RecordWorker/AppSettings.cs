@@ -15,5 +15,15 @@ namespace RecordWorker
         /// 連線字串
         /// </summary>
         public string ConnectionString { get; private set; }
+
+        /// <summary>
+        /// RabbitMQ 主機名稱
+        /// </summary>
+        public string RabbitMQHostName { get; private set; }
+
+        /// <summary>
+        /// RabbitMQ Port號
+        /// </summary>
+        public int RabbitMQPort { get; private set; }
     }
 }

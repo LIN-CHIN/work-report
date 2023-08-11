@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using PublishWorker.RabbitMQ;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
@@ -12,10 +13,11 @@ namespace PublishWorker
     public class Application
     {
         private static ManualResetEvent _manualResetEvent = new ManualResetEvent(false);
-
-        public Application() 
+        private readonly IRabbitMQHelper _rabbitMQHelper;
+        private readonly string _calculatedResultQueueName = "calculatedResult";
+        public Application(IRabbitMQHelper rabbitMQHelper) 
         {
-        
+            _rabbitMQHelper = rabbitMQHelper;
         }
 
         /// <summary>
@@ -23,25 +25,12 @@ namespace PublishWorker
         /// </summary>
         public void Run()
         {
-            var factory = new ConnectionFactory
-            {
-                HostName = "rabbitmq",
-                Port = 5672
-            };
-            using var connection = factory.CreateConnection();
-            using var channel = connection.CreateModel();
+            using var connection = _rabbitMQHelper.Connect();
+            using var channel = _rabbitMQHelper.CreateModel(connection);
 
-            const string CALCULATED_RESULT_QUEUE_NAME = "calculatedResult";
-
-            channel.QueueDeclare(
-                queue: CALCULATED_RESULT_QUEUE_NAME,
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null);
+            SetQueue(channel);
 
             var consumer = new EventingBasicConsumer(channel);
-
             consumer.Received += (model, ea) =>
             {
                 var body = ea.Body.ToArray();
@@ -61,11 +50,25 @@ namespace PublishWorker
                 channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
             };
 
-            channel.BasicConsume(queue: CALCULATED_RESULT_QUEUE_NAME,
+            channel.BasicConsume(queue: _calculatedResultQueueName,
                      autoAck: false,
                      consumer: consumer);
 
             _manualResetEvent.WaitOne();
+        }
+
+        /// <summary>
+        /// 設定Queue
+        /// </summary>
+        /// <param name="channel"></param>
+        public void SetQueue(IModel channel) 
+        {
+            channel.QueueDeclare(
+                    queue: _calculatedResultQueueName,
+                    durable: true,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: null);
         }
     }
 }

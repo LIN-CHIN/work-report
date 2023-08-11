@@ -14,12 +14,15 @@ namespace CalculateWorker.CacheServices
     public class CacheService : ICacheService
     {
         private IDatabase _db;
+        private readonly AppSettings _appSettings;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public CacheService()
+        /// <param name="appSettings"></param>
+        public CacheService(AppSettings appSettings)
         {
+            _appSettings = appSettings;
             ConfigureRedis();
         }
         
@@ -28,8 +31,8 @@ namespace CalculateWorker.CacheServices
         /// </summary>
         private void ConfigureRedis()
         {
-            string redisHost = "redis";
-            int redisPort = 6379; 
+            string redisHost = _appSettings.RedisHostName;
+            int redisPort = _appSettings.RedisPort; 
 
             string connectionString = $"{redisHost}:{redisPort},allowAdmin=true,abortConnect=false";
             ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(connectionString);

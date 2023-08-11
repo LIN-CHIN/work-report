@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using CalculateWorker.CacheServices;
+using CalculateWorker.RabbitMQ;
 
 namespace CalculateWorker
 {
@@ -14,14 +15,21 @@ namespace CalculateWorker
     {
         private static ManualResetEvent _manualResetEvent = new ManualResetEvent(false);
         private readonly ICacheService _cacheService;
+        private readonly IRabbitMQHelper _rabbitMQHelper;
+        private readonly string _exchangeName = "workReport";
+        private readonly string _workReportQueueName = "workReportB";
+        private readonly string _calculatedResultQueueName = "calculatedResult";
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="cacheService"></param>
-        public Application(ICacheService cacheService) 
+        /// <param name="rabbitMQHelper"></param>
+        public Application(ICacheService cacheService,
+            IRabbitMQHelper rabbitMQHelper) 
         {
             _cacheService = cacheService;
+            _rabbitMQHelper = rabbitMQHelper;
         }
 
         /// <summary>
@@ -29,43 +37,12 @@ namespace CalculateWorker
         /// </summary>
         public void Run() 
         {
-            var factory = new ConnectionFactory
-            {
-                HostName = "rabbitmq",
-                Port = 5672
-            };
-            using var connection = factory.CreateConnection();
-            using var channel = connection.CreateModel();
+            using var connection = _rabbitMQHelper.Connect();
+            using var channel = _rabbitMQHelper.CreateModel(connection);
 
-            const string EXCHANGE_NAME = "workReport";
-            const string WORK_REPORT_QUEUE_NAME = "workReportB";
-            const string CALCULATED_RESULT_QUEUE_NAME = "calculatedResult";
-
-            channel.QueueDeclare(
-                queue: WORK_REPORT_QUEUE_NAME,
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null);
-
-            channel.QueueDeclare(
-               queue: CALCULATED_RESULT_QUEUE_NAME,
-               durable: true,
-               exclusive: false,
-               autoDelete: false,
-               arguments: null);
-
-            //設定Exchange
-            channel.ExchangeDeclare(
-                exchange: EXCHANGE_NAME,
-                type: ExchangeType.Fanout);
-
-            //綁定Queue & Exchange
-            channel.QueueBind(
-                queue: WORK_REPORT_QUEUE_NAME,
-                exchange: EXCHANGE_NAME,
-                routingKey: string.Empty
-                );
+            SetQueue(channel);
+            SetExchange(channel);
+            BindExchange(channel);
 
             var consumer = new EventingBasicConsumer(channel);
             consumer.Received += (model, ea) =>
@@ -82,12 +59,10 @@ namespace CalculateWorker
 
                     //取得今天的日期
                     DateTimeOffset today = DateTimeOffset.Now.Date;
-                    
                     DateTimeOffset tonightMidnight = today.AddHours(24).AddTicks(-1);
 
-                    // 將時間轉換為當地時區
-                    DateTimeOffset localTonightMidnight = TimeZoneInfo.ConvertTime(tonightMidnight, localTimeZone);
-                    Console.WriteLine("今天的晚上 12:00 分在當地時區的時間為：" + localTonightMidnight);
+                    //將時間轉換為當地時區
+                    DateTimeOffset expiratimeTime = TimeZoneInfo.ConvertTime(tonightMidnight, localTimeZone);
 
                     string hourKey = $"{reportModel.MachineNumber}_Hour";
                     string minuteKey = $"{reportModel.MachineNumber}_Minute";
@@ -97,41 +72,10 @@ namespace CalculateWorker
                     CalculationResult calculationResult = new CalculationResult();
                     calculationResult.MachineNumber = reportModel.MachineNumber;
 
-                    //小時計算
-                    if (_cacheService.IsKeyExist(hourKey))
-                    {
-                        calculationResult.TotalHour = _cacheService.GetData<int>(hourKey) + reportModel.SpendTimeHour; ; 
-                        _cacheService.SetData<int>(hourKey, calculationResult.TotalHour, localTonightMidnight);
-                    }
-                    else 
-                    {
-                        calculationResult.TotalHour = reportModel.SpendTimeHour;
-                        _cacheService.SetData<int>(hourKey, reportModel.SpendTimeHour, localTonightMidnight);
-                    }
-
-                    //分鐘計算
-                    if (_cacheService.IsKeyExist(minuteKey))
-                    {
-                        calculationResult.TotalMinute = _cacheService.GetData<int>(minuteKey) + reportModel.SpendTimeMinute;
-                        _cacheService.SetData<int>(minuteKey, calculationResult.TotalMinute, localTonightMidnight);
-                    }
-                    else
-                    {
-                        calculationResult.TotalMinute = reportModel.SpendTimeMinute;
-                        _cacheService.SetData<int>(minuteKey, reportModel.SpendTimeMinute, localTonightMidnight);
-                    }
-
-                    //秒數計算
-                    if (_cacheService.IsKeyExist(secondKey))
-                    {
-                        calculationResult.TotalSecond = _cacheService.GetData<int>(secondKey) + reportModel.SpendTimeSecond;
-                        _cacheService.SetData<int>(secondKey, calculationResult.TotalSecond, localTonightMidnight);
-                    }
-                    else
-                    {
-                        calculationResult.TotalSecond = reportModel.SpendTimeSecond;
-                        _cacheService.SetData<int>(secondKey, reportModel.SpendTimeSecond, localTonightMidnight);
-                    }
+                    //計算時間
+                    calculationResult.TotalHour = CalculateTime(hourKey, reportModel.SpendTimeHour, expiratimeTime);
+                    calculationResult.TotalMinute = CalculateTime(minuteKey, reportModel.SpendTimeMinute, expiratimeTime);
+                    calculationResult.TotalSecond = CalculateTime(secondKey, reportModel.SpendTimeSecond, expiratimeTime);
 
                     //總數計算
                     calculationResult.TotalCount = _cacheService.IncreaseKey(countKey);
@@ -139,7 +83,7 @@ namespace CalculateWorker
                     //發送訊息
                     channel.BasicPublish(
                         exchange: string.Empty,
-                        routingKey: CALCULATED_RESULT_QUEUE_NAME,
+                        routingKey: _calculatedResultQueueName,
                         basicProperties: null,
                         body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(calculationResult)) );
 
@@ -150,10 +94,80 @@ namespace CalculateWorker
                 Console.WriteLine("The calculate worker has been completed.");
             };
 
-            channel.BasicConsume(queue: WORK_REPORT_QUEUE_NAME,
+            channel.BasicConsume(queue: _workReportQueueName,
                      autoAck: false,
                      consumer: consumer);
              _manualResetEvent.WaitOne();
+        }
+
+        /// <summary>
+        /// 設定Queue
+        /// </summary>
+        /// <param name="channel"></param>
+        private void SetQueue(IModel channel)
+        {
+            channel.QueueDeclare(
+                queue: _workReportQueueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
+
+            channel.QueueDeclare(
+               queue: _calculatedResultQueueName,
+               durable: true,
+               exclusive: false,
+               autoDelete: false,
+               arguments: null);
+        }
+
+        /// <summary>
+        /// 設定Exchange
+        /// </summary>
+        /// <param name="channel"></param>
+        private void SetExchange(IModel channel)
+        {
+            channel.ExchangeDeclare(
+                exchange: _exchangeName,
+                type: ExchangeType.Fanout);
+        }
+
+        /// <summary>
+        /// 將綁定Queue 綁定 Exchange
+        /// </summary>
+        /// <param name="channel"></param>
+        private void BindExchange(IModel channel)
+        {
+            //綁定Queue & Exchange
+            channel.QueueBind(
+                queue: _workReportQueueName,
+                exchange: _exchangeName,
+                routingKey: string.Empty
+            );
+        }
+
+        /// <summary>
+        /// 計算時間
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="expiratimeTime"></param>
+        private int CalculateTime(string key, int value, DateTimeOffset expiratimeTime) 
+        {
+            int result = 0;
+
+            //小時計算
+            if (_cacheService.IsKeyExist(key))
+            {
+                result = _cacheService.GetData<int>(key) + value;
+            }
+            else
+            {
+                result = value;
+            }
+
+            _cacheService.SetData<int>(key, result, expiratimeTime);
+            return result;
         }
     }
 }

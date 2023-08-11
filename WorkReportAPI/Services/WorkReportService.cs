@@ -2,6 +2,7 @@
 using RabbitMQ.Client;
 using System.Text;
 using WorkReportAPI.DTOs;
+using WorkReportAPI.RabbitMQ;
 
 namespace WorkReportAPI.Services
 {
@@ -10,22 +11,29 @@ namespace WorkReportAPI.Services
     /// </summary>
     public class WorkReportService : IWorkReportService
     {
+        private readonly IRabbitMQHelper _rabbitMQHelper;
+        private readonly string _exchangeName = "workReport";
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="rabbitMQHelper"></param>
+        public WorkReportService(IRabbitMQHelper rabbitMQHelper) 
+        {
+            _rabbitMQHelper = rabbitMQHelper;
+        }
+
         ///<inheritdoc/>
         public void Report(ReportDTO reportModel)
         {
             Console.WriteLine("Preparing to put the information into the queue.");
-            var factory = new ConnectionFactory { 
-                HostName = "rabbitmq",
-                Port = 5672 };
 
-            using var connection = factory.CreateConnection();
-            using var channel = connection.CreateModel();
-
-            const string EXCHANGE_NAME = "workReport";
+            using var connection = _rabbitMQHelper.Connect();
+            using var channel = _rabbitMQHelper.CreateModel(connection);
 
             //設定Exchange
             channel.ExchangeDeclare(
-                exchange: EXCHANGE_NAME,
+                exchange: _exchangeName,
                 type: ExchangeType.Fanout);
 
             ReportModel result = ReportModel.ConvertReportModel(reportModel);
@@ -34,7 +42,7 @@ namespace WorkReportAPI.Services
                 JsonConvert.SerializeObject(result));
 
             channel.BasicPublish(
-                exchange: EXCHANGE_NAME,
+                exchange: _exchangeName,
                 routingKey: string.Empty,
                 basicProperties: null,
                 body: body);
