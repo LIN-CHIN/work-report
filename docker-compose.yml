@@ -73,6 +73,10 @@ services:
     build: 
       context: .
       dockerfile: ./WorkReportAPI/Dockerfile
+    environment:
+      - TZ=Asia/Taipei
+      - AppSettings__RabbitMQHostName=$RABBIT_MQ_HOST_NAME
+      - AppSettings__RabbitMQPort=$RABBIT_MQ_PORT
     networks: 
       - report-network
   record-worker:
@@ -86,6 +90,8 @@ services:
     environment:
       - TZ=Asia/Taipei
       - AppSettings__ConnectionString=$RECORD_DB_CONNECTION
+      - AppSettings__RabbitMQHostName=$RABBIT_MQ_HOST_NAME
+      - AppSettings__RabbitMQPort=$RABBIT_MQ_PORT
     networks: 
       - report-network
     depends_on:
@@ -103,6 +109,10 @@ services:
       dockerfile: ./CalculateWorker/Dockerfile
     environment:
       - TZ=Asia/Taipei
+      - AppSettings__RabbitMQHostName=$RABBIT_MQ_HOST_NAME
+      - AppSettings__RabbitMQPort=$RABBIT_MQ_PORT
+      - AppSettings__RedisHostName=$REDIS_HOST_NAME
+      - AppSettings__RedisPort=$REDIS_PORT
     networks: 
       - report-network
     depends_on: 
@@ -120,6 +130,8 @@ services:
       dockerfile: ./PublishWorker/Dockerfile
     environment:
       - TZ=Asia/Taipei
+      - AppSettings__RabbitMQHostName=$RABBIT_MQ_HOST_NAME
+      - AppSettings__RabbitMQPort=$RABBIT_MQ_PORT
     networks: 
       - report-network
     depends_on: 
