@@ -1,142 +1,170 @@
 version: '3.8'
 services:
-  rabbitmq:
-    image: rabbitmq:3.8.27-management-alpine
-    container_name: rabbitmq
-    hostname: rabbitmq
-    restart: always
-    mem_limit: 2g
-    ports: 
-      - "15672:15672"
-      - "5672:5672"
-    volumes : 
-      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq
-      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
-    environment:
-      - TZ=Asia/Taipei
-      - RABBITMQ_DEFAULT_USER="guest"
-      - RABBITMQ_DEFAULT_PASS="guest"
-    healthcheck:
-      test: rabbitmq-diagnostics -q ping
-      interval: 30s
-      timeout: 30s
-      retries: 3
-    networks: 
-      - report-network
-  redis:
-    container_name: redis
-    hostname: redis
-    image: redis
-    mem_limit: 2g
-    ports:
-      - "6379:6379"
-    networks: 
-      - report-network
+   rabbitmq:
+     image: rabbitmq:3.8.27-management-alpine
+     container_name: rabbitmq
+     hostname: rabbitmq
+     restart: always
+     mem_limit: 2g
+     ports: 
+       - "15672:15672"
+       - "5672:5672"
+     volumes : 
+       - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq
+       - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+     environment:
+       - TZ=Asia/Taipei
+       - RABBITMQ_DEFAULT_USER="guest"
+       - RABBITMQ_DEFAULT_PASS="guest"
+     healthcheck:
+       test: rabbitmq-diagnostics -q ping
+       interval: 30s
+       timeout: 30s
+       retries: 3
+     networks: 
+       - report-network
+   redis:
+     container_name: redis
+     hostname: redis
+     image: redis
+     mem_limit: 2g
+     ports:
+       - "6379:6379"
+     networks: 
+       - report-network
 
-  redis-commander:
-    container_name: redis-commander
-    hostname: redis-commander
-    image: rediscommander/redis-commander:latest
-    restart: always
-    environment:
-      - REDIS_HOSTS=local:redis:6379
-    mem_limit: 300m
-    ports:
-      - "8081:8081"
-    networks: 
-      - report-network
+   redis-commander:
+     container_name: redis-commander
+     hostname: redis-commander
+     image: rediscommander/redis-commander:latest
+     restart: always
+     environment:
+       - REDIS_HOSTS=local:redis:6379
+     mem_limit: 300m
+     ports:
+       - "8081:8081"
+     networks: 
+       - report-network
     
-  record-db:
-    image: postgres:14.1-alpine
-    container_name: record-db
-    hostname: record-db
-    restart: always
-    ports:
-      - "5432:5432"
-    mem_limit: 300m
-    environment:
-      - TZ=Asia/Taipei
-      - POSTGRES_USER=$DEFAULT_USER
-      - POSTGRES_PASSWORD=$DEFAULT_PASSWORD
-      - POSTGRES_DB=$MAIN_DB
-    volumes:
-      - ~/.docker-conf/RecordDb/data:/var/lib/postgresql/data
-    networks: 
-      - report-network
-  work-report-api:
-    container_name: work-report-api
-    hostname: work-report-api
-    restart: always
-    mem_limit: 300m
-    ports: 
-      - "7001:80"
-    build: 
-      context: .
-      dockerfile: ./WorkReportAPI/Dockerfile
-    environment:
-      - TZ=Asia/Taipei
-      - AppSettings__RabbitMQHostName=$RABBIT_MQ_HOST_NAME
-      - AppSettings__RabbitMQPort=$RABBIT_MQ_PORT
-    networks: 
-      - report-network
-  record-worker:
-    container_name: record-worker
-    hostname: record-worker
-    restart: always
-    mem_limit: 300m
-    build: 
-      context: .
-      dockerfile: ./RecordWorker/Dockerfile
-    environment:
-      - TZ=Asia/Taipei
-      - AppSettings__ConnectionString=$RECORD_DB_CONNECTION
-      - AppSettings__RabbitMQHostName=$RABBIT_MQ_HOST_NAME
-      - AppSettings__RabbitMQPort=$RABBIT_MQ_PORT
-    networks: 
-      - report-network
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-      record-db:
-        condition: service_started
-  calculate-worker:
-    container_name: calculate-worker
-    hostname: calculate-worker
-    restart: always
-    mem_limit: 300m
-    build: 
-      context: .
-      dockerfile: ./CalculateWorker/Dockerfile
-    environment:
-      - TZ=Asia/Taipei
-      - AppSettings__RabbitMQHostName=$RABBIT_MQ_HOST_NAME
-      - AppSettings__RabbitMQPort=$RABBIT_MQ_PORT
-      - AppSettings__RedisHostName=$REDIS_HOST_NAME
-      - AppSettings__RedisPort=$REDIS_PORT
-    networks: 
-      - report-network
-    depends_on: 
-      redis:
-        condition: service_started
-      rabbitmq:
-        condition: service_healthy
-  publish-worker:
-    container_name: publish-worker
-    hostname: publish-worker
-    restart: always
-    mem_limit: 300m
-    build: 
-      context: .
-      dockerfile: ./PublishWorker/Dockerfile
-    environment:
-      - TZ=Asia/Taipei
-      - AppSettings__RabbitMQHostName=$RABBIT_MQ_HOST_NAME
-      - AppSettings__RabbitMQPort=$RABBIT_MQ_PORT
-    networks: 
-      - report-network
-    depends_on: 
-      rabbitmq:
-        condition: service_healthy
+   record-db:
+     image: postgres:14.1-alpine
+     container_name: record-db
+     hostname: record-db
+     restart: always
+     ports:
+       - "5432:5432"
+     mem_limit: 300m
+     environment:
+       - TZ=Asia/Taipei
+       - POSTGRES_USER=$DEFAULT_USER
+       - POSTGRES_PASSWORD=$DEFAULT_PASSWORD
+       - POSTGRES_DB=$MAIN_DB
+     volumes:
+       - ~/.docker-conf/RecordDb/data:/var/lib/postgresql/data
+     networks: 
+       - report-network
+   work-report-api:
+     container_name: work-report-api
+     hostname: work-report-api
+     restart: always
+     mem_limit: 300m
+     ports: 
+       - "7001:80"
+     build: 
+       context: .
+       dockerfile: ./WorkReportAPI/Dockerfile
+     environment:
+       - TZ=Asia/Taipei
+       - AppSettings__RabbitMQHostName=$RABBIT_MQ_HOST_NAME
+       - AppSettings__RabbitMQPort=$RABBIT_MQ_PORT
+       - ElasticSettings__Url=$ELASTIC_URL
+     networks: 
+       - report-network
+   record-worker:
+     container_name: record-worker
+     hostname: record-worker
+     restart: always
+     mem_limit: 300m
+     build: 
+       context: .
+       dockerfile: ./RecordWorker/Dockerfile
+     environment:
+       - TZ=Asia/Taipei
+       - AppSettings__ConnectionString=$RECORD_DB_CONNECTION
+       - AppSettings__RabbitMQHostName=$RABBIT_MQ_HOST_NAME
+       - AppSettings__RabbitMQPort=$RABBIT_MQ_PORT
+     networks: 
+       - report-network
+     depends_on:
+       rabbitmq:
+         condition: service_healthy
+       record-db:
+         condition: service_started
+   calculate-worker:
+     container_name: calculate-worker
+     hostname: calculate-worker
+     restart: always
+     mem_limit: 300m
+     build: 
+       context: .
+       dockerfile: ./CalculateWorker/Dockerfile
+     environment:
+       - TZ=Asia/Taipei
+       - AppSettings__RabbitMQHostName=$RABBIT_MQ_HOST_NAME
+       - AppSettings__RabbitMQPort=$RABBIT_MQ_PORT
+       - AppSettings__RedisHostName=$REDIS_HOST_NAME
+       - AppSettings__RedisPort=$REDIS_PORT
+     networks: 
+       - report-network
+     depends_on: 
+       redis:
+         condition: service_started
+       rabbitmq:
+         condition: service_healthy
+   publish-worker:
+     container_name: publish-worker
+     hostname: publish-worker
+     restart: always
+     mem_limit: 300m
+     build: 
+       context: .
+       dockerfile: ./PublishWorker/Dockerfile
+     environment:
+       - TZ=Asia/Taipei
+       - AppSettings__RabbitMQHostName=$RABBIT_MQ_HOST_NAME
+       - AppSettings__RabbitMQPort=$RABBIT_MQ_PORT
+     networks: 
+       - report-network
+     depends_on: 
+       rabbitmq:
+         condition: service_healthy
+   elasticsearch:
+     container_name: elasticsearch
+     hostname: elasticsearch
+     image: elasticsearch:7.16.1
+     ports:
+       - "9200:9200"
+     volumes:
+       - ~/.docker-conf/elasticsearch/data:/usr/share/elasticsearch/data
+     environment:
+       - xpack.monitoring.enabled=true
+       - xpack.watcher.enabled=false
+       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+       - discovery.type=single-node
+     networks:
+       - report-network
+   kibana:
+     container_name: kibana
+     image: kibana:7.16.1
+     mem_limit: 2g
+     ports:
+       - "5601:5601"
+     depends_on:
+       - elasticsearch
+     environment:
+       - ELASTICSEARCH_URL=$ELASTIC_URL
+     networks:
+       - report-network
       
 networks:
   report-network:
