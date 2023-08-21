@@ -3,24 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WorkReportClient.Services;
+using WorkReportClient.Services.LogServices;
+using WorkReportClient.Services.WorkReports;
 
 namespace WorkReportClient
 {
     public class Application
     {
-        private readonly List<string> defaultMachineNumbers =
+        private readonly List<string> _defaultMachineNumbers =
             new List<string> { "M1", "M2", "M3" };
 
         private readonly IWorkReportService _workReportService;
+        private readonly ILogService _logService;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="workReportService"></param>
-        public Application(IWorkReportService workReportService) 
+        /// <param name="logService"></param>
+        public Application(IWorkReportService workReportService,
+            ILogService logService) 
         {
             _workReportService = workReportService;
+            _logService = logService;
         }
 
         /// <summary>
@@ -28,6 +33,7 @@ namespace WorkReportClient
         /// </summary>
         public void Run() 
         {
+            _logService.WriteInfoLog("workReportClient started");
             while (true) 
             {
                 Console.WriteLine("Start work report .");
@@ -59,7 +65,7 @@ namespace WorkReportClient
                     Console.WriteLine("Cannot input space or null.");
                     machineNumber = "";
                 }
-                else if (!defaultMachineNumbers.Contains(machineNumber))
+                else if (!_defaultMachineNumbers.Contains(machineNumber))
                 {
                     Console.WriteLine("Invalid machine number");
                     machineNumber = "";

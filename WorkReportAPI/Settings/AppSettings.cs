@@ -1,4 +1,4 @@
-﻿namespace WorkReportAPI
+﻿namespace WorkReportAPI.Settings
 {
     public class AppSettings
     {

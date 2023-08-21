@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WorkReportClient
+namespace WorkReportClient.Settings
 {
     public class AppSettings
     {
@@ -21,8 +21,9 @@ namespace WorkReportClient
         /// <summary>
         /// 報工URL
         /// </summary>
-        public string WorkReportUrl { 
-            get 
+        public string WorkReportUrl
+        {
+            get
             {
                 return $"{WorkReportAPIHost}{WorkReportRoute}";
             }

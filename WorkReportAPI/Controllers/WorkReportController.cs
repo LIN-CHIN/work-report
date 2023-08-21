@@ -14,9 +14,20 @@ namespace WorkReportAPI.Controllers
     {
         private readonly IWorkReportService _workReportService;
 
-        public WorkReportController(IWorkReportService workReportService) 
+        public WorkReportController(IWorkReportService workReportService)
         {
             _workReportService = workReportService;
+        }
+
+        [HttpPost("test")]
+        public IActionResult Test(Test test)
+        {
+            return Ok(new
+            {
+                Response = "回傳訊息",
+                Message = "這是訊息",
+                IsEnable = false
+            }) ;
         }
 
         /// <summary>
@@ -25,10 +36,16 @@ namespace WorkReportAPI.Controllers
         /// <param name="reportModel"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Report(ReportDTO reportModel) 
+        public IActionResult Report(ReportDTO reportModel)
         {
             _workReportService.Report(reportModel);
             return Ok();
         }
     }
+}
+
+public class Test
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
 }

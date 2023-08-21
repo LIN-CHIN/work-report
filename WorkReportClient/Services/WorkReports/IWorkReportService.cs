@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WorkReportClient.Services
+namespace WorkReportClient.Services.WorkReports
 {
     /// <summary>
     /// 報工Service Interface

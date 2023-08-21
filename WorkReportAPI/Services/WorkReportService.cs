@@ -12,21 +12,24 @@ namespace WorkReportAPI.Services
     public class WorkReportService : IWorkReportService
     {
         private readonly IRabbitMQHelper _rabbitMQHelper;
+        private readonly ILogger<WorkReportService> _logger;
         private readonly string _exchangeName = "workReport";
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="rabbitMQHelper"></param>
-        public WorkReportService(IRabbitMQHelper rabbitMQHelper) 
+        public WorkReportService(IRabbitMQHelper rabbitMQHelper, ILogger<WorkReportService> logger) 
         {
             _rabbitMQHelper = rabbitMQHelper;
+            _logger = logger;
         }
 
         ///<inheritdoc/>
         public void Report(ReportDTO reportModel)
         {
             Console.WriteLine("Preparing to put the information into the queue.");
+            _logger.LogInformation("Preparing to put the information into the queue.");
 
             using var connection = _rabbitMQHelper.Connect();
             using var channel = _rabbitMQHelper.CreateModel(connection);
@@ -48,6 +51,7 @@ namespace WorkReportAPI.Services
                 body: body);
 
             Console.WriteLine("Placement completed.");
+            _logger.LogInformation("Placement completed.");
         }
     }
 }

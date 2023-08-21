@@ -1,4 +1,5 @@
 ﻿using RabbitMQ.Client;
+using WorkReportAPI.Settings;
 
 namespace WorkReportAPI.RabbitMQ
 {
