@@ -36,12 +36,13 @@ namespace WorkReportClient.Services.WorkReports
         ///<inheritdoc/>
         public void Report(ReportModel reportModel)
         {
-            _logService.WriteInfoLog($"Call WorkReportAPI, URL = {_appSettings.WorkReportUrl}");
+            string eventId = Guid.NewGuid().ToString();
+
+            _logService.WriteInfoLog($"Call WorkReportAPI, URL = {_appSettings.WorkReportUrl}", eventId);
             var requestMsg = new HttpRequestMessage(HttpMethod.Post, _appSettings.WorkReportUrl);
             var body = JsonConvert.SerializeObject(reportModel);
 
-            string eventId = Guid.NewGuid().ToString();
-            requestMsg.Headers.Add("EventId", eventId.ToString());
+            requestMsg.Headers.Add("EventId", eventId);
             requestMsg.Content = new StringContent(body, Encoding.UTF8, "application/json");
 
             //紀錄Log
@@ -53,12 +54,12 @@ namespace WorkReportClient.Services.WorkReports
             // 成功
             if (response.StatusCode.ToString() != "OK")
             {
-                _logService.WriteErrorLog("Call report api error");
+                _logService.WriteErrorLog("Call report api error", eventId);
                 throw new Exception("Call report api error");
             }
             else
             {
-                _logService.WriteInfoLog("Work report completed");
+                _logService.WriteInfoLog("Work report completed", eventId);
             }
         }
     }

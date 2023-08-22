@@ -5,6 +5,7 @@ using Serilog.Exceptions;
 using Serilog.Sinks.Elasticsearch;
 using System;
 using System.Reflection;
+using WorkReportAPI.AppLogs;
 using WorkReportAPI.Middlewares;
 using WorkReportAPI.RabbitMQ;
 using WorkReportAPI.Services;
@@ -33,6 +34,7 @@ try
     //Dependency Injection
     builder.Services.AddSingleton(appSettings!);
     builder.Services.AddSingleton(elasticSettings!);
+    builder.Services.AddSingleton<ILogService, LogService>();
     builder.Services.AddTransient<IWorkReportService, WorkReportService>();
     builder.Services.AddTransient<IRabbitMQHelper, RabbitMQHelper>();
 

@@ -1,15 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Serilog;
+﻿using Newtonsoft.Json;
 using Serilog.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WorkReportClient.AppLogs;
 
-namespace WorkReportClient.Services.LogServices
+namespace WorkReportAPI.AppLogs
 {
     /// <summary>
     /// Log Service
@@ -18,7 +10,7 @@ namespace WorkReportClient.Services.LogServices
     {
         private readonly ILogger<LogService> _logger;
 
-        public LogService(ILogger<LogService> logger) 
+        public LogService(ILogger<LogService> logger)
         {
             _logger = logger;
         }
