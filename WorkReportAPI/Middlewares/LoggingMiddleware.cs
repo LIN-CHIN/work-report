@@ -13,10 +13,10 @@ namespace WorkReportAPI.Middlewares
     public class LoggingMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ILogger<LoggingMiddleware> _logger;
+        private readonly ILogService _logger;
         private readonly RecyclableMemoryStreamManager _recyclableMemoryStreamManager;
 
-        public LoggingMiddleware(RequestDelegate next, ILogger<LoggingMiddleware> logger) 
+        public LoggingMiddleware(RequestDelegate next, ILogService logger) 
         {
             _next = next;
             _logger = logger;
@@ -31,16 +31,16 @@ namespace WorkReportAPI.Middlewares
             string eventId = context.Request.Headers["EventId"].ToString();
             if (string.IsNullOrWhiteSpace(eventId)) 
             {
-                throw new Exception("Header一定要有EventId");
+                throw new ArgumentException("Header一定要有EventId");
             }
             
             request.EventId = eventId;
             request.Body = await GetRequestBody(context.Request);
-            _logger.LogInformation(JsonConvert.SerializeObject(request));
+            _logger.WriteBody(eventId, LogMessageTypeEnum.Request, JsonConvert.SerializeObject(request));
 
             response.EventId = eventId;
             response.Body = await GetResponseBody(context);
-            _logger.LogInformation(JsonConvert.SerializeObject(response));
+            _logger.WriteBody(eventId, LogMessageTypeEnum.Response, JsonConvert.SerializeObject(response));
 
         }
 

@@ -62,6 +62,7 @@ void ConfigureLogging(string elasticUrl)
         .Enrich.WithExceptionDetails()
         .WriteTo.Elasticsearch(ConfigureElasticSink(elasticUrl))
         .WriteTo.File("Logs/log.txt", rollingInterval: RollingInterval.Day)
+        .WriteTo.Console()
         .CreateLogger();
 }
 
