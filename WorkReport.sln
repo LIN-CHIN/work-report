@@ -3,15 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33502.453
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkReportClient", "WorkReportClient\WorkReportClient.csproj", "{B6E25798-E8BF-4594-A60D-E6BD678D2694}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkReportClient", "WorkReportClient\WorkReportClient.csproj", "{B6E25798-E8BF-4594-A60D-E6BD678D2694}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkReportAPI", "WorkReportAPI\WorkReportAPI.csproj", "{85FBCB52-41EE-4A0E-9CDD-60E7B716A2EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkReportAPI", "WorkReportAPI\WorkReportAPI.csproj", "{85FBCB52-41EE-4A0E-9CDD-60E7B716A2EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecordWorker", "RecordWorker\RecordWorker.csproj", "{5078DFC9-FDC2-4722-8901-077BBF34FB8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecordWorker", "RecordWorker\RecordWorker.csproj", "{5078DFC9-FDC2-4722-8901-077BBF34FB8E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalculateWorker", "CalculateWorker\CalculateWorker.csproj", "{14D6969C-0833-4EF6-85DE-A243F32B1B94}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalculateWorker", "CalculateWorker\CalculateWorker.csproj", "{14D6969C-0833-4EF6-85DE-A243F32B1B94}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PublishWorker", "PublishWorker\PublishWorker.csproj", "{E5245D80-63AE-42A9-AA8C-CB6E20911259}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PublishWorker", "PublishWorker\PublishWorker.csproj", "{E5245D80-63AE-42A9-AA8C-CB6E20911259}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticsearchAPI", "ElasticsearchAPI\ElasticsearchAPI.csproj", "{FDB5A87F-C13B-40A4-BBBF-9A2FD0AA24CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{E5245D80-63AE-42A9-AA8C-CB6E20911259}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5245D80-63AE-42A9-AA8C-CB6E20911259}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5245D80-63AE-42A9-AA8C-CB6E20911259}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDB5A87F-C13B-40A4-BBBF-9A2FD0AA24CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDB5A87F-C13B-40A4-BBBF-9A2FD0AA24CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDB5A87F-C13B-40A4-BBBF-9A2FD0AA24CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDB5A87F-C13B-40A4-BBBF-9A2FD0AA24CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
