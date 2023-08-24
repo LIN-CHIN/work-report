@@ -17,10 +17,10 @@ services:
        - RABBITMQ_DEFAULT_USER="guest"
        - RABBITMQ_DEFAULT_PASS="guest"
      healthcheck:
-       test: rabbitmq-diagnostics -q ping
+       test: rabbitmq-diagnostics -q listeners --node rabbit@rabbitmq
        interval: 30s
        timeout: 30s
-       retries: 3
+       retries: 10
      networks: 
        - report-network
    redis:
@@ -165,6 +165,23 @@ services:
        - ELASTICSEARCH_URL=$ELASTIC_URL
      networks:
        - report-network
+   work-report-elasticsearch-api:
+      container_name: work-report-elasticsearch-api
+      hostname: work-report-elasticsearch-api
+      restart: always
+      mem_limit: 300m
+      ports: 
+        - "7002:80"
+      build: 
+        context: .
+        dockerfile: ./ElasticsearchAPI/Dockerfile
+      environment:
+        - TZ=Asia/Taipei
+        - ElasticSettings__Url=$ELASTIC_URL
+      depends_on:
+        - elasticsearch
+      networks: 
+        - report-network
       
 networks:
   report-network:

@@ -22,7 +22,10 @@ namespace ElasticsearchAPI.Controllers
         public IActionResult GetByEventId([FromQuery] QueryDocumentDTO queryDocumentDTO,
                                           [FromQuery] QueryBaseDTO queryBaseDTO)
         {
-            return Ok(_elasticsearchService.Get(queryDocumentDTO, queryBaseDTO));
+            return Ok(new 
+            { 
+                items = _elasticsearchService.Get(queryDocumentDTO, queryBaseDTO) 
+            });
         }
 
         /// <summary>
@@ -36,7 +39,10 @@ namespace ElasticsearchAPI.Controllers
         public IActionResult GetByEventId( [FromRoute] string eventId,
                                            [FromQuery] QueryBaseDTO queryBaseDTO) 
         {
-            return Ok(_elasticsearchService.GetByEventId(eventId, queryBaseDTO));
+            return Ok( new 
+            {
+                items = _elasticsearchService.GetByEventId(eventId, queryBaseDTO)
+            });
         }
     }
 }
