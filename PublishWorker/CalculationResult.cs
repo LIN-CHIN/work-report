@@ -10,13 +10,15 @@ namespace PublishWorker
     public class CalculationResult
     {
         /// <summary>
+        /// 事件ID
+        /// </summary>
+        public Guid EventId { get; set; }
+
+        /// <summary>
         /// 設備代碼
         /// </summary>
         [Required]
-        public string MachineNumber
-        {
-            get; set;
-        }
+        public string MachineNumber { get; set; }
 
         /// <summary>
         /// 總小時數

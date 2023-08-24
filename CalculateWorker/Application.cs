@@ -6,8 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using CalculateWorker.CacheServices;
 using CalculateWorker.RabbitMQ;
+using CalculateWorker.Services.CacheServices;
+using CalculateWorker.AppLogs;
+using CalculateWorker.Services.LogServices;
 
 namespace CalculateWorker
 {
@@ -16,6 +18,7 @@ namespace CalculateWorker
         private static ManualResetEvent _manualResetEvent = new ManualResetEvent(false);
         private readonly ICacheService _cacheService;
         private readonly IRabbitMQHelper _rabbitMQHelper;
+        private readonly ILogService _logService;
         private readonly string _exchangeName = "workReport";
         private readonly string _workReportQueueName = "workReportB";
         private readonly string _calculatedResultQueueName = "calculatedResult";
@@ -26,10 +29,12 @@ namespace CalculateWorker
         /// <param name="cacheService"></param>
         /// <param name="rabbitMQHelper"></param>
         public Application(ICacheService cacheService,
-            IRabbitMQHelper rabbitMQHelper) 
+            IRabbitMQHelper rabbitMQHelper,
+            ILogService logService) 
         {
             _cacheService = cacheService;
             _rabbitMQHelper = rabbitMQHelper;
+            _logService = logService;
         }
 
         /// <summary>
@@ -51,9 +56,13 @@ namespace CalculateWorker
                 var body = ea.Body.ToArray();
                 ReportModel? reportModel = JsonConvert.DeserializeObject<ReportModel>(
                     Encoding.UTF8.GetString(body));
-                
+
+                string eventId = null;
                 if (reportModel != null)
                 {
+                    eventId = reportModel.EventId.ToString();
+                    _logService.WriteBody(eventId, LogMessageTypeEnum.Request, reportModel);
+
                     //取得當地的時區資訊
                     TimeZoneInfo localTimeZone = TimeZoneInfo.Local;
 
@@ -70,6 +79,7 @@ namespace CalculateWorker
                     string countKey = $"{reportModel.MachineNumber}_Count";
 
                     CalculationResult calculationResult = new CalculationResult();
+                    calculationResult.EventId = reportModel.EventId;
                     calculationResult.MachineNumber = reportModel.MachineNumber;
 
                     //計算時間
@@ -87,11 +97,12 @@ namespace CalculateWorker
                         basicProperties: null,
                         body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(calculationResult)) );
 
-                    Console.WriteLine("The calculate worker has published the message");
+                    _logService.WriteInfoLog("The computation has been completed and the message has been pushed to the queue.",
+                       eventId);
                 }
 
                 channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-                Console.WriteLine("The calculate worker has been completed.");
+                _logService.WriteInfoLog("The 'received' event of the calculate worker has been completed.", eventId);
             };
 
             channel.BasicConsume(queue: _workReportQueueName,

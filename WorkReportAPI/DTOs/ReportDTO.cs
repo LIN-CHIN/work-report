@@ -9,6 +9,12 @@ namespace WorkReportAPI.DTOs
     public class ReportDTO
     {
         /// <summary>
+        /// 事件ID
+        /// </summary>
+        [JsonRequired]
+        public Guid EventId { get; set; }
+
+        /// <summary>
         /// 設備代碼
         /// </summary>
         [JsonRequired]

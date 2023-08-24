@@ -13,6 +13,12 @@ namespace WorkReportClient
     public class ReportModel
     {
         /// <summary>
+        /// 事件id
+        /// </summary>
+        [Required]
+        public Guid EventId { get; set; }
+
+        /// <summary>
         /// 設備代碼
         /// </summary>
         [Required]

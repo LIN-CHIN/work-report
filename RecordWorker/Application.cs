@@ -2,10 +2,12 @@
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using RecordWorker.AppLogs;
 using RecordWorker.Context;
 using RecordWorker.Entities;
 using RecordWorker.RabbitMQ;
-using RecordWorker.Services;
+using RecordWorker.Services.LogServices;
+using RecordWorker.Services.WorkReports;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +22,7 @@ namespace RecordWorker
         private static ManualResetEvent _manualResetEvent = new ManualResetEvent(false);
         private readonly IWorkReportRecordService _workReportRecordService;
         private readonly IRabbitMQHelper _rabbitMQHelper;
+        private readonly ILogService _logService;
         private readonly string _exchangeName = "workReport";
         private readonly string _queueName = "workReportA";
 
@@ -29,10 +32,12 @@ namespace RecordWorker
         /// <param name="workReportRecordService"></param>
         /// <param name="rabbitMQHelper"></param>
         public Application(IWorkReportRecordService workReportRecordService,
-            IRabbitMQHelper rabbitMQHelper)
+            IRabbitMQHelper rabbitMQHelper,
+            ILogService logService)
         {
             _workReportRecordService = workReportRecordService;
             _rabbitMQHelper = rabbitMQHelper;
+            _logService = logService;
         }
 
         /// <summary>
@@ -48,6 +53,7 @@ namespace RecordWorker
             BindQueue(channel);
 
             var consumer = new EventingBasicConsumer(channel);
+          
             consumer.Received += (model, ea) =>
             {
                 Console.WriteLine("The Record Worker has received the message");
@@ -55,8 +61,12 @@ namespace RecordWorker
                 ReportModel? reportModel = JsonConvert.DeserializeObject<ReportModel>(
                     Encoding.UTF8.GetString(body));
 
+                string eventId = null;
                 if (reportModel != null) 
                 {
+                    eventId = reportModel.EventId.ToString();
+
+                    _logService.WriteBody(eventId, LogMessageTypeEnum.Request, reportModel);
                     _workReportRecordService.Insert(new WorkReportRecord 
                     {
                         EventId = reportModel.EventId,
@@ -65,10 +75,12 @@ namespace RecordWorker
                         SpendTimeMinute = reportModel.SpendTimeMinute,
                         SpendTimeSecond = reportModel.SpendTimeSecond
                     });
+
+                    _logService.WriteInfoLog("The addition of the record to the database has been completed.", eventId);
                 }
 
                 channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-                Console.WriteLine("The record has been completed.");
+                _logService.WriteInfoLog("The 'received' event of the record worker has been completed.", eventId);
             };
 
             channel.BasicConsume(queue: _queueName,

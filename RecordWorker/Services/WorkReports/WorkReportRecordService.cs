@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RecordWorker.Services
+namespace RecordWorker.Services.WorkReports
 {
     /// <summary>
     /// 報工紀錄Service
@@ -19,9 +19,9 @@ namespace RecordWorker.Services
         /// Constructor
         /// </summary>
         /// <param name="workReportRecordDAO"></param>
-        public WorkReportRecordService(IWorkReportRecordDAO workReportRecordDAO) 
+        public WorkReportRecordService(IWorkReportRecordDAO workReportRecordDAO)
         {
-            _workReportRecordDAO = workReportRecordDAO; 
+            _workReportRecordDAO = workReportRecordDAO;
         }
 
         ///<inheritdoc/>

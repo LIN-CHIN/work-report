@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using PublishWorker.Settings;
+using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;

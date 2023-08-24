@@ -1,4 +1,5 @@
 ﻿using RabbitMQ.Client;
+using RecordWorker.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -53,8 +53,6 @@ catch (Exception ex)
 
 void ConfigureLogging(string elasticUrl)
 {
-    var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-
     Log.Logger = new LoggerConfiguration()
         .MinimumLevel.Information()
         .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)

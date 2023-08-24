@@ -1,7 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using RecordWorker.AppLogs;
 using Serilog.Context;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace WorkReportAPI.AppLogs
+namespace RecordWorker.Services.LogServices
 {
     /// <summary>
     /// Log Service

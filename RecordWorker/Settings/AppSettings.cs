@@ -4,13 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CalculateWorker
+namespace RecordWorker.Settings
 {
     /// <summary>
     /// App設定
     /// </summary>
     public class AppSettings
     {
+        /// <summary>
+        /// 連線字串
+        /// </summary>
+        public string ConnectionString { get; private set; }
+
         /// <summary>
         /// RabbitMQ 主機名稱
         /// </summary>
@@ -20,15 +25,5 @@ namespace CalculateWorker
         /// RabbitMQ Port號
         /// </summary>
         public int RabbitMQPort { get; private set; }
-
-        /// <summary>
-        /// Redis 主機名稱
-        /// </summary>
-        public string RedisHostName { get; private set; }
-
-        /// <summary>
-        /// Redis Port號
-        /// </summary>
-        public int RedisPort { get; private set; }
     }
 }

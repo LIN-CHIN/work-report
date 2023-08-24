@@ -1,6 +1,6 @@
 ﻿using RecordWorker.Entities;
 
-namespace RecordWorker.Services
+namespace RecordWorker.Services.WorkReports
 {
     /// <summary>
     /// 報工紀錄Service Interface

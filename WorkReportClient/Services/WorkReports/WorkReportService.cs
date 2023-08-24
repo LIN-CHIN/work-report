@@ -36,7 +36,7 @@ namespace WorkReportClient.Services.WorkReports
         ///<inheritdoc/>
         public void Report(ReportModel reportModel)
         {
-            string eventId = Guid.NewGuid().ToString();
+            string eventId = reportModel.EventId.ToString();
 
             _logService.WriteInfoLog($"Call WorkReportAPI, URL = {_appSettings.WorkReportUrl}", eventId);
             var requestMsg = new HttpRequestMessage(HttpMethod.Post, _appSettings.WorkReportUrl);

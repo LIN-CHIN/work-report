@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PublishWorker
+namespace PublishWorker.Settings
 {
     /// <summary>
     /// App設定

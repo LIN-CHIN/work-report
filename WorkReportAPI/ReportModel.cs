@@ -48,7 +48,7 @@ namespace WorkReportAPI
         {
             return new ReportModel
             {
-                EventId = Guid.NewGuid(),
+                EventId = dto.EventId,
                 MachineNumber = dto.MachineNumber,
                 SpendTimeHour = dto.SpendTimeHour,
                 SpendTimeMinute = dto.SpendTimeMinute,

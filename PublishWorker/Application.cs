@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
+using PublishWorker.AppLogs;
 using PublishWorker.RabbitMQ;
+using PublishWorker.Services.LogServices;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
@@ -14,10 +16,12 @@ namespace PublishWorker
     {
         private static ManualResetEvent _manualResetEvent = new ManualResetEvent(false);
         private readonly IRabbitMQHelper _rabbitMQHelper;
+        private readonly ILogService _logService;
         private readonly string _calculatedResultQueueName = "calculatedResult";
-        public Application(IRabbitMQHelper rabbitMQHelper) 
+        public Application(IRabbitMQHelper rabbitMQHelper, ILogService logService) 
         {
             _rabbitMQHelper = rabbitMQHelper;
+            _logService = logService;
         }
 
         /// <summary>
@@ -37,17 +41,26 @@ namespace PublishWorker
                 CalculationResult? calculationResult = JsonConvert.DeserializeObject<CalculationResult>(
                     Encoding.UTF8.GetString(body));
 
+                string eventId = null;
                 if (calculationResult != null) 
                 {
+                    eventId = calculationResult.EventId.ToString();
+                    _logService.WriteBody(eventId,
+                        LogMessageTypeEnum.Request,
+                        calculationResult);
+
                     Console.WriteLine($"MachineNumber : {calculationResult.MachineNumber}");
                     Console.WriteLine($"TotalHour : {calculationResult.TotalHour}");
                     Console.WriteLine($"TotalMinute : {calculationResult.TotalMinute}");
                     Console.WriteLine($"TotalSecond : {calculationResult.TotalSecond}");
                     Console.WriteLine($"TotalCount : {calculationResult.TotalCount}");
                     Console.WriteLine($"--------------------------------------------");
+
+                    _logService.WriteInfoLog("The message has already been sent.", eventId);
                 }
 
                 channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                _logService.WriteInfoLog("The 'received' event of the publish worker has been completed.", eventId);
             };
 
             channel.BasicConsume(queue: _calculatedResultQueueName,

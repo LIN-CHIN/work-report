@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using CalculateWorker.Settings;
+using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CalculateWorker.CacheServices
+namespace CalculateWorker.Services.CacheServices
 {
     /// <summary>
     /// Cache Service
@@ -25,14 +26,14 @@ namespace CalculateWorker.CacheServices
             _appSettings = appSettings;
             ConfigureRedis();
         }
-        
+
         /// <summary>
         /// 設定Redis
         /// </summary>
         private void ConfigureRedis()
         {
             string redisHost = _appSettings.RedisHostName;
-            int redisPort = _appSettings.RedisPort; 
+            int redisPort = _appSettings.RedisPort;
 
             string connectionString = $"{redisHost}:{redisPort},allowAdmin=true,abortConnect=false";
             ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(connectionString);
@@ -71,7 +72,7 @@ namespace CalculateWorker.CacheServices
         }
 
         ///<inheritdoc/>
-        public bool IsKeyExist(string key) 
+        public bool IsKeyExist(string key)
         {
             return _db.KeyExists(key);
         }
@@ -79,7 +80,7 @@ namespace CalculateWorker.CacheServices
         ///<inheritdoc/>
         public long IncreaseKey(string key, long value = 1)
         {
-           return _db.StringIncrement(key, value);
+            return _db.StringIncrement(key, value);
         }
     }
 }

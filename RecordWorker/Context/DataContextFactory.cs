@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RecordWorker.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;

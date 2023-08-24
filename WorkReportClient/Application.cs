@@ -39,6 +39,7 @@ namespace WorkReportClient
                 Console.WriteLine("Start work report .");
                 _workReportService.Report(new ReportModel
                 {
+                    EventId = Guid.NewGuid(),
                     MachineNumber = GetMachineNumber(),
                     SpendTimeHour = GetSpendTimeHour(),
                     SpendTimeMinute = GetSpendTimeMinute(),

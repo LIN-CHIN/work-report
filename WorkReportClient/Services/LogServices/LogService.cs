@@ -65,7 +65,7 @@ namespace WorkReportClient.Services.LogServices
 
             using (LogContext.PushProperty("EventID", eventId, true))
             {
-                _logger.LogInformation(JsonConvert.SerializeObject(body));
+                _logger.LogInformation(JsonConvert.SerializeObject(logModel));
             }
         }
     }

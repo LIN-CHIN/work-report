@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CalculateWorker.CacheServices
+namespace CalculateWorker.Services.CacheServices
 {
     /// <summary>
     /// Cache Service Interface
