@@ -93,6 +93,7 @@ services:
        - AppSettings__ConnectionString=$RECORD_DB_CONNECTION
        - AppSettings__RabbitMQHostName=$RABBIT_MQ_HOST_NAME
        - AppSettings__RabbitMQPort=$RABBIT_MQ_PORT
+       - ElasticSettings__Url=$ELASTIC_URL
      networks: 
        - report-network
      depends_on:
@@ -114,6 +115,7 @@ services:
        - AppSettings__RabbitMQPort=$RABBIT_MQ_PORT
        - AppSettings__RedisHostName=$REDIS_HOST_NAME
        - AppSettings__RedisPort=$REDIS_PORT
+       - ElasticSettings__Url=$ELASTIC_URL
      networks: 
        - report-network
      depends_on: 
@@ -133,6 +135,7 @@ services:
        - TZ=Asia/Taipei
        - AppSettings__RabbitMQHostName=$RABBIT_MQ_HOST_NAME
        - AppSettings__RabbitMQPort=$RABBIT_MQ_PORT
+       - ElasticSettings__Url=$ELASTIC_URL
      networks: 
        - report-network
      depends_on: 
