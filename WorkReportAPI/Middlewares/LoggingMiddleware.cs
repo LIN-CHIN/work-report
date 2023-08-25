@@ -25,22 +25,17 @@ namespace WorkReportAPI.Middlewares
 
         public async Task InvokeAsync(HttpContext context) 
         {
-            LogModel request = new LogModel() { LogMessageType = LogMessageTypeEnum.Request};
-            LogModel response = new LogModel() { LogMessageType = LogMessageTypeEnum.Response };
-
             string eventId = context.Request.Headers["EventId"].ToString();
             if (string.IsNullOrWhiteSpace(eventId)) 
             {
                 throw new ArgumentException("Header一定要有EventId");
             }
             
-            request.EventId = eventId;
-            request.Body = await GetRequestBody(context.Request);
-            _logger.WriteBody(eventId, LogMessageTypeEnum.Request, JsonConvert.SerializeObject(request));
+            object requestBody = await GetRequestBody(context.Request);
+            _logger.WriteBody(eventId, LogMessageTypeEnum.Request, JsonConvert.SerializeObject(requestBody));
 
-            response.EventId = eventId;
-            response.Body = await GetResponseBody(context);
-            _logger.WriteBody(eventId, LogMessageTypeEnum.Response, JsonConvert.SerializeObject(response));
+            object responseBody = await GetResponseBody(context);
+            _logger.WriteBody(eventId, LogMessageTypeEnum.Response, JsonConvert.SerializeObject(responseBody));
 
         }
 
