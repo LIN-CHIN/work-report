@@ -9,6 +9,7 @@ using System.Reflection;
 using Serilog.Exceptions;
 using PublishWorker.Settings;
 using PublishWorker.Services.LogServices;
+using PublishWorker.Services.LineNotifyServices;
 
 try
 {
@@ -23,18 +24,24 @@ try
     var elasticSettings = config.GetSection("ElasticSettings")
       .Get<ElasticSettings>(opt => opt.BindNonPublicProperties = true);
 
+    var lineNotifySettings = config.GetSection("LineNotifySettings")
+      .Get<LineNotifySettings>(opt => opt.BindNonPublicProperties = true);
+
     // 建立 DI 容器
     var serviceProvider = new ServiceCollection()
         .AddSingleton<IConfiguration>(config)
         .AddSingleton<Application>()
         .AddSingleton(appSettings!)
         .AddSingleton(elasticSettings!)
+        .AddSingleton(lineNotifySettings!)
         .AddSingleton<ILogService, LogService>()
         .AddScoped<IRabbitMQHelper, RabbitMQHelper>()
+        .AddScoped<ILineNotifyService, LineNotifyService>()
         .AddLogging(builder =>
         {
             builder.AddSerilog();
         })
+        .AddHttpClient()
         .BuildServiceProvider();
 
     //設定Log

@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using PublishWorker.AppLogs;
+using PublishWorker.DTOs.LineNotifyDTOs;
 using PublishWorker.RabbitMQ;
+using PublishWorker.Services.LineNotifyServices;
 using PublishWorker.Services.LogServices;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -17,11 +19,22 @@ namespace PublishWorker
         private static ManualResetEvent _manualResetEvent = new ManualResetEvent(false);
         private readonly IRabbitMQHelper _rabbitMQHelper;
         private readonly ILogService _logService;
+        private readonly ILineNotifyService _lineNotifyService;
         private readonly string _calculatedResultQueueName = "calculatedResult";
-        public Application(IRabbitMQHelper rabbitMQHelper, ILogService logService) 
+        
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="rabbitMQHelper"></param>
+        /// <param name="logService"></param>
+        /// <param name="lineNotifyService"></param>
+        public Application(IRabbitMQHelper rabbitMQHelper,
+            ILogService logService,
+            ILineNotifyService lineNotifyService) 
         {
             _rabbitMQHelper = rabbitMQHelper;
             _logService = logService;
+            _lineNotifyService = lineNotifyService;
         }
 
         /// <summary>
@@ -49,13 +62,19 @@ namespace PublishWorker
                         LogMessageTypeEnum.Request,
                         calculationResult);
 
-                    Console.WriteLine($"MachineNumber : {calculationResult.MachineNumber}");
-                    Console.WriteLine($"TotalHour : {calculationResult.TotalHour}");
-                    Console.WriteLine($"TotalMinute : {calculationResult.TotalMinute}");
-                    Console.WriteLine($"TotalSecond : {calculationResult.TotalSecond}");
-                    Console.WriteLine($"TotalCount : {calculationResult.TotalCount}");
-                    Console.WriteLine($"--------------------------------------------");
+                    string notification = "\n" +
+                                          $"MachineNumber : {calculationResult.MachineNumber}" + "\n" +
+                                          $"TotalHour : {calculationResult.TotalHour}" + "\n" +
+                                          $"TotalMinute : {calculationResult.TotalMinute}" + "\n" +
+                                          $"TotalSecond : {calculationResult.TotalSecond}" + "\n" +
+                                          $"TotalCount : {calculationResult.TotalCount}" + "\n" ; 
+                    
+                    Console.WriteLine(notification);
 
+                    _lineNotifyService.Publish(new PublishNotifyDTO
+                    {
+                        Message = notification
+                    });
                     _logService.WriteInfoLog("The message has already been sent.", eventId);
                 }
 

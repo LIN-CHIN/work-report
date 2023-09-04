@@ -136,6 +136,10 @@ services:
        - AppSettings__RabbitMQHostName=$RABBIT_MQ_HOST_NAME
        - AppSettings__RabbitMQPort=$RABBIT_MQ_PORT
        - ElasticSettings__Url=$ELASTIC_URL
+       - LineNotifySettings__AccessToken=$LINE_NOTIFY_ACCESS_TOKEN
+       - LineNotifySettings__Host=$LINE_NOTIFY_HOST
+       - LineNotifySettings__Prefix=$LINE_NOTIFY_PREFIX
+       - LineNotifySettings__PublishRoute=$LINE_NOTIFY_PUBLISH_ROUTE
      networks: 
        - report-network
      depends_on: 
