@@ -57,9 +57,9 @@ docker compose --env-file docker-compose.env up -d
 ## Run : 
 1. Open the `WorkReportClient`
 2. Enter the machine number. `M1`, `M2` or `M3`
-3. Enter the send time(hour)
-4. Enter the send time(minute)
-5. Enter the send time(second)
+3. Enter the spend time(hour)
+4. Enter the spend time(minute)
+5. Enter the spend time(second)
 
 Observe if each worker is functioning correctly and receive work report messages on the Line app. 
 
