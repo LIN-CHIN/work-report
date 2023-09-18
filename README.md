@@ -4,12 +4,13 @@ This is a project simulating the equipment work reporting process in a factory.
 ## Tools :
 1. `.NET Core 6 Console Application`
 2. `.NET Core 6 Web API`
-3. `Docker`
-4. `RabbitMQ`
-5. `Redis`
-6. `Postgresql`
-7. `Elasticsearch`
-8. `Kibana`
+3. `Entity Framework`
+4. `Docker`
+5. `RabbitMQ`
+6. `Redis`
+7. `Postgresql`
+8. `Elasticsearch`
+9. `Kibana`
 
 ## Projects :
 1. WorkReportClient :
