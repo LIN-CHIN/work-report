@@ -19,17 +19,6 @@ namespace WorkReportAPI.Controllers
             _workReportService = workReportService;
         }
 
-        [HttpPost("test")]
-        public IActionResult Test(Test test)
-        {
-            return Ok(new
-            {
-                Response = "回傳訊息",
-                Message = "這是訊息",
-                IsEnable = false
-            }) ;
-        }
-
         /// <summary>
         /// 報工
         /// </summary>
@@ -42,10 +31,4 @@ namespace WorkReportAPI.Controllers
             return Ok();
         }
     }
-}
-
-public class Test
-{
-    public string Id { get; set; }
-    public string Name { get; set; }
 }
